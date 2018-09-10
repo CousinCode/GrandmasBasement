@@ -16,8 +16,7 @@ export default class DungeonScene extends Phaser.Scene {
     this.playerStats.mana = 0;
     this.playerStats.speed = 150;
     this.playerStats.inventory =[]; // array of objects
-    
-//    let lootItem = {}; // name, armor modifier, health modifier, attack modifier, speed modifier, mana mod
+    this.infotext ;
 
    }
 
@@ -66,27 +65,10 @@ export default class DungeonScene extends Phaser.Scene {
     } 
   }
 
-
-
-
-
-
  
 
-
-
-
-
-
-
-
-
-
-  
-
-
   stringify(array)
-  {
+  { //TODO:
     // pipette seperated fields
     // first field speaks to the number of fields
     // all even fields speak to what kind of field follows
@@ -96,16 +78,22 @@ export default class DungeonScene extends Phaser.Scene {
     
     updateText()
     {
-            // Help text that has a "fixed" position on the screen
-         this.add
-          .text(16, 82, `Health: ${this.playerStats.health} \n  Gold: ${this.playerStats.gold}  `, {
-            font: "18px monospace",
-            fill: "#000000",
-            padding: { x: 10, y: 10 },
-            backgroundColor: "#ffffff"
-          })
-          .setScrollFactor(0); 
-    
+            //  Updates the stats text
+            if(this.infotext==undefined)
+            { 
+             this.add
+              .text(16, 82, `Health: ${this.playerStats.health} \n  Gold: ${this.playerStats.gold}  `, {
+              font: "18px monospace",
+              fill: "#000000",
+              padding: { x: 10, y: 10 },
+              backgroundColor: "#ffffff"
+              })
+             .setScrollFactor(0); 
+            }
+            else
+            {
+              this.infotext.setText( `Health: ${this.playerStats.health} \n  Gold: ${this.playerStats.gold}  `);
+            }
           this.saveStats();
     }
     addGold(amount)
@@ -140,6 +128,8 @@ export default class DungeonScene extends Phaser.Scene {
     this.level++;
 
     this.hasPlayerReachedStairs = false;
+
+    this.input.addPointer(5); // for multitouch 
 
     // Generate a random world with a few extra options:
     //  - Rooms should only have odd number dimensions so that they have a center tile.
@@ -223,11 +213,11 @@ export default class DungeonScene extends Phaser.Scene {
     // Place stuff in the 90% "otherRooms"
     otherRooms.forEach(room => {
       var rand = Math.random();
-      if (rand <= 0.25) {
-        // 25% chance of chest
+      if (rand <= 0.3) {
+        // 30% chance of chest
         this.stuffLayer.putTileAt(TILES.CHEST, room.centerX, room.centerY);
       } else if (rand <= 0.8) {
-        // 50% chance of a pot anywhere in the room... except don't block a door!
+        // 80% chance of a health fountian anywhere in the room... except don't block a door!
       //  const x = Phaser.Math.Between(room.left + 2, room.right - 2);
       //  const y = Phaser.Math.Between(room.top + 2, room.bottom - 2);
         this.stuffLayer.putTileAt(TILES.HEALTHALTAR, room.centerX, room.centerY);
@@ -236,11 +226,17 @@ export default class DungeonScene extends Phaser.Scene {
       } else {
         // 25% of either 2 or 4 towers, depending on the room size
         if (room.height >= 9) {
+          this.stuffLayer.putTilesAt(TILES.CHEST, room.centerX - 1, room.centerY + 1);
+          this.stuffLayer.putTilesAt(TILES.CHEST, room.centerX + 1, room.centerY + 1);
+          this.stuffLayer.putTilesAt(TILES.CHEST, room.centerX - 1, room.centerY - 2);
+          this.stuffLayer.putTilesAt(TILES.CHEST, room.centerX + 1, room.centerY - 2);
           // this.stuffLayer.putTilesAt(TILES.TOWER, room.centerX - 1, room.centerY + 1);
           // this.stuffLayer.putTilesAt(TILES.TOWER, room.centerX + 1, room.centerY + 1);
           // this.stuffLayer.putTilesAt(TILES.TOWER, room.centerX - 1, room.centerY - 2);
           // this.stuffLayer.putTilesAt(TILES.TOWER, room.centerX + 1, room.centerY - 2);
         } else {
+          this.stuffLayer.putTilesAt(TILES.CHEST, room.centerX - 1, room.centerY - 1);
+          this.stuffLayer.putTilesAt(TILES.HEALTHALTAR, room.centerX + 1, room.centerY - 1);
           // this.stuffLayer.putTilesAt(TILES.TOWER, room.centerX - 1, room.centerY - 1);
           // this.stuffLayer.putTilesAt(TILES.TOWER, room.centerX + 1, room.centerY - 1);
         }
@@ -249,15 +245,15 @@ export default class DungeonScene extends Phaser.Scene {
 
     // Not exactly correct for the tileset since there are more possible floor tiles, but this will
     // do for the example.
-    this.groundLayer.setCollisionByExclusion([-1,1,2,3, 6, 7, 8,9, 26,617,619]);
-    this.stuffLayer.setCollisionByExclusion([-1, 1,2,3, 6, 7, 8,9, 26,617,619]);
+    this.groundLayer.setCollisionByExclusion([-1,1,2,3, 6, 7, 8,9, 26,617,619,490,491,492,493]);
+    this.stuffLayer.setCollisionByExclusion([-1, 1,2,3, 6, 7, 8,9, 26,617,619,490,491,492,493]);
 
     this.stuffLayer.setTileIndexCallback(TILES.HEALTHALTAR, (test,test2) => {
       
-      this.healthAltarHeal(); 
+    this.healthAltarHeal(); 
 
-      this.stuffLayer.putTileAt(9,test2.x,test2.y);
-      this.updateText();
+    this.stuffLayer.putTileAt(9,test2.x,test2.y);
+    this.updateText();
   });  
 
 
@@ -270,9 +266,9 @@ export default class DungeonScene extends Phaser.Scene {
 
     this.stuffLayer.setTileIndexCallback(TILES.STAIRS, () => {
       this.stuffLayer.setTileIndexCallback(TILES.STAIRS, null);
+      this.addGold(100);
+      this.updateText();
       this.hasPlayerReachedStairs = true;
-        this.addGold(100);
-        this.updateText();
       this.player.freeze();
       const cam = this.cameras.main;
       cam.fade(250, 0, 0, 0);
@@ -319,8 +315,10 @@ export default class DungeonScene extends Phaser.Scene {
   update(time, delta) {
     if (this.hasPlayerReachedStairs) return;
 
-    this.player.update();
+ 
+    this.player.update(this.input.pointer1);
 
+ 
     // Find the player's room using another helper method from the dungeon that converts from
     // dungeon XY (in grid units) to the corresponding room object
     const playerTileX = this.groundLayer.worldToTileX(this.player.sprite.x);

@@ -14,22 +14,22 @@ const TILE_MAPPING = {
     RIGHT: [{ index: 921, weight: 4 }, { index: [921, 921, 921], weight: 1 }],
     BOTTOM: [{ index: 921, weight: 4 }, { index: [921, 921, 921], weight: 1 }]
   },
-  FLOOR: [{ index: 617, weight: 9 }, { index: [617, 617, 617], weight: 1 }],
+  FLOOR: [{ index: 490, weight: 7 }, { index: [491, 492, 493], weight: 1 }],
   HEALTHALTAR: 2,
   DOOR: {
-    TOP: [617, 617, 617],
+    TOP: [490, 490, 490],
     // prettier-ignore
     LEFT: [
-      [617], 
-      [617], 
-      [617]
+      [490], 
+      [490], 
+      [490]
     ],
-    BOTTOM: [617, 617, 617],
+    BOTTOM: [490, 490, 490],
     // prettier-ignore
     RIGHT: [
-      [617], 
-      [617], 
-      [617]
+      [490], 
+      [490], 
+      [490]
     ]
   },
   CHEST: 7,

@@ -1,3 +1,4 @@
+
 export default class Player {
   constructor(scene, x, y) {
     this.scene = scene;
@@ -35,7 +36,7 @@ export default class Player {
   }
     
   
-  update() {
+  update(pointer1) {
     const keys = this.keys;
     const sprite = this.sprite;
     const speed = 300;
@@ -43,6 +44,30 @@ export default class Player {
 
     // Stop any previous movement from the last frame
     sprite.body.setVelocity(0);
+
+   
+    if (pointer1.isDown )
+    {  
+
+      let spX = 400;
+      let spY= 300;
+              // Horizontal movement
+            if ( pointer1.x<spX-20) {
+               sprite.body.setVelocityX(-speed);
+               sprite.setFlipX(true);
+            } else if ( pointer1.x>spX+20) {
+               sprite.body.setVelocityX(speed);
+               sprite.setFlipX(false);
+            }
+
+            // Vertical movement
+            if ( pointer1.y<spY-20) {
+               sprite.body.setVelocityY(-speed);
+            } else if ( pointer1.y>spY+20) {
+               sprite.body.setVelocityY(speed);
+            }
+    };
+
 
     // Horizontal movement
     if (keys.left.isDown) {
@@ -64,7 +89,7 @@ export default class Player {
     sprite.body.velocity.normalize().scale(speed);
 
     // Update the animation last and give left/right animations precedence over up/down animations
-    if (keys.left.isDown || keys.right.isDown || keys.down.isDown) {
+    if (keys.left.isDown || keys.right.isDown || keys.down.isDown||pointer1.isDown) {
       sprite.anims.play("player-walk", true);
     } else if (keys.up.isDown) {
       sprite.anims.play("player-walk-back", true);
@@ -78,6 +103,6 @@ export default class Player {
   }
 
   destroy() {
-    this.sprite.destroy();
+  //  this.sprite.destroy();
   }
 }
